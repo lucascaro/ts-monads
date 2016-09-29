@@ -1,11 +1,6 @@
-import {
-  identity,
-  Maybe,
-  some,
-  none,
-  left,
-  right
-} from './Monad'
+import {identity} from './Identity'
+import {some, none} from './Maybe'
+import {left, right} from './Either'
 
 import {expect} from 'chai'
 

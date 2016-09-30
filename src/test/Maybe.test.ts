@@ -201,6 +201,22 @@ describe('Maybe', function() {
     })
   })
 
+  describe('#orElse', function() {
+    it('returns first maybe if some', function() {
+      const r = some('value1').orElse(some('other value'))
+      mlog.log(r)
+      expect(r.isSome)
+      expect(r.value).to.equal('value1')
+    })
+
+    it('returns second maybe if none', function() {
+      const r = none('value1').orElse(some('other value'))
+      mlog.log(r)
+      expect(r.isNone)
+      expect(r.value).to.equal('other value')
+    })
+  })
+
   describe('#filter', function() {
     it('returns value if true', function() {
       const r = some('value1').filter(i => i === 'value1')

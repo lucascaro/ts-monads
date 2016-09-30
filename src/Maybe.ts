@@ -20,6 +20,7 @@ export interface Maybe<T> extends Monad<T> {
   defaulting(t: T): Some<T>
   caseOf<U,V>(c: MaybeCase<T,U,V>): U | V
   orSome<U>(m: U): T | U
+  orElse(m: Maybe<T>): Maybe<T>
 }
 
 export interface Some<T> extends Maybe<T> {}
@@ -42,7 +43,8 @@ export function some<T>(t: T): Some<T> {
     toString,
     defaulting,
     caseOf,
-    orSome
+    orSome,
+    orElse
   }
 
   function bind<U>(transform: (t: T) => Maybe<U>): Maybe<U> {
@@ -90,6 +92,10 @@ export function some<T>(t: T): Some<T> {
     return self.value
   }
 
+  function orElse(m: Maybe<T>): Maybe<T> {
+    return self
+  }
+
   function defaulting(t: T): Some<T> {
     return self
   }
@@ -117,7 +123,8 @@ export function none<T>(t?: T): Maybe<T> {
     toString,
     caseOf,
     defaulting,
-    orSome
+    orSome,
+    orElse,
   }
 
   function bind<U>(transform: (t: T) => Maybe<U>): Maybe<T> {
@@ -166,6 +173,10 @@ export function none<T>(t?: T): Maybe<T> {
 
   function orSome<U>(v: U): U {
     return v
+  }
+
+  function orElse(m: Maybe<T>): Maybe<T> {
+    return m
   }
 
   return Object.freeze(self)

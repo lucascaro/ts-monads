@@ -3,7 +3,7 @@ import {Monad} from './Monad'
 export interface Either<L,R> /* extends Monad<?> */{
   isLeft: boolean
   isRight: boolean
-
+  value: L|R
   // constructor(left: L, right: R)
   left(): L
   right(): R
@@ -11,7 +11,9 @@ export interface Either<L,R> /* extends Monad<?> */{
   map<U>(transform: (r: R) => Either<U,R>): Either<U,R>
 }
 
-export interface Left<L,R> extends Either<L,R> {}
+export interface Left<L,R> extends Either<L,R> {
+  value: L
+}
 export function left<L,R>(l: L): Either<L,R> {
   const value: L = l
   const isLeft: boolean = true
@@ -49,7 +51,9 @@ export function left<L,R>(l: L): Either<L,R> {
 
 }
 
-export interface Right<L,R> extends Either<L,R> {}
+export interface Right<L,R> extends Either<L,R> {
+  value: R
+}
 export function right<L,R>(r: R): Either<L,R> {
   const isLeft: boolean = false
   const isRight: boolean = true

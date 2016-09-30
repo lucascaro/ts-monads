@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node src",
     "build": "tsc -p .",
-    "test": "mocha lib/index.js",
-    "watch": "run-p \"{build,test} -- --watch\""
+    "test": "mocha lib/test/**/*.js",
+    "watch": "npm run build && run-p \"{build,test} -- --watch\""
   },
   "author": "Lucas Caro <lucascaro@gmail.com>",
   "license": "ISC",

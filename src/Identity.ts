@@ -31,8 +31,8 @@ export function identity<T>(t: T): Identity<T> {
     return identity<U>(m.value(value))
   }
 
-  function join<U extends Monad<T>>(): Monad<T> {
-    return bind((i: Monad<T>) => i)
+  function join(): T {
+    return self.value
   }
 
   function takeLeft<U>(m: Monad<U>): Identity<T> {

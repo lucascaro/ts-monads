@@ -8,14 +8,18 @@ export interface MaybeCase<T,U,V> {
 export interface Maybe<T> extends Monad<T> {
   isSome: boolean
   isNone: boolean
-  bind<T>(transform: (T) => Maybe<T>): Maybe<T>
+  value: T
+  bind<U>(transform: (t: T) => Maybe<U>): Maybe<U>
   unit<T>(value: T): Maybe<T>
-  map<U>(transform: (T) => U): Maybe<U>
-  ap<U>(m: Maybe<((t: T) => U)>): Maybe<U>
-  join<U extends Maybe<T>>(): Maybe<T>
+  map<U>(transform: (t: T) => U): Maybe<U>
+  ap<U>(m: Maybe<(t: T) => U>): Maybe<U>
+  join(): T
   takeLeft<U>(m: Maybe<U>): Maybe<T|U>
   takeRight<U>(m: Maybe<U>): Maybe<U>
-  caseOf<U,V>(c: MaybeCase<T,U,V>): U|V
+  filter(f: (t: T) => boolean): Maybe<T>
+  defaulting(t: T): Some<T>
+  caseOf<U,V>(c: MaybeCase<T,U,V>): U | V
+  orSome<U>(m: U): T | U
 }
 
 export interface Some<T> extends Maybe<T> {}
@@ -34,8 +38,11 @@ export function some<T>(t: T): Some<T> {
     join,
     takeLeft,
     takeRight,
+    filter,
+    toString,
+    defaulting,
     caseOf,
-    toString
+    orSome
   }
 
   function bind<U>(transform: (t: T) => Maybe<U>): Maybe<U> {
@@ -50,12 +57,13 @@ export function some<T>(t: T): Some<T> {
     return some<T>(v)
   }
 
-  function ap<U>(m: Maybe<((t: T) => U)>): Maybe<U> {
-    return m.unit(m.value(value))
+  function ap<U>(m: Maybe<(t: T) => U>): Maybe<U> {
+    const r = m.value(self.value)
+    return m.isSome ? some(r) : none(r)
   }
-
-  function join<U extends Maybe<T>>(): Maybe<T> {
-    return none(value) // wat
+  // join m = m >>= id
+  function join(): T {
+    return value
   }
 
   function takeLeft<U>(m: Maybe<U>): Maybe<T|U> {
@@ -66,6 +74,10 @@ export function some<T>(t: T): Some<T> {
     return m.isSome ? m : none(m.value)
   }
 
+  function filter(f: (t: T) => boolean): Maybe<T> {
+    return f(self.value) ? self : none<T>()
+  }
+
   function toString(): string {
     return `Some(${value})`
   }
@@ -74,11 +86,19 @@ export function some<T>(t: T): Some<T> {
     return c.some(value)
   }
 
+  function orSome<U>(v: U): T {
+    return self.value
+  }
+
+  function defaulting(t: T): Some<T> {
+    return self
+  }
+
   return Object.freeze(self)
 }
 
 export interface None<T> extends Maybe<T> {}
-export function none<T>(t: T): Maybe<T> {
+export function none<T>(t?: T): Maybe<T> {
   const value: T = t
   const isSome: boolean = false
   const isNone: boolean = true
@@ -93,36 +113,43 @@ export function none<T>(t: T): Maybe<T> {
     join,
     takeLeft,
     takeRight,
+    filter,
+    toString,
     caseOf,
-    toString
+    defaulting,
+    orSome
   }
 
-  function bind(transform: (t: T) => Maybe<T>): Maybe<T> {
+  function bind<U>(transform: (t: T) => Maybe<U>): Maybe<T> {
     return self
   }
 
-  function map<U>(transform: (t: T) => U): None<U> {
-    return none<U>(transform(value))
+  function map<U>(transform: (t: T) => U): None<T> {
+    return self
   }
 
   function unit(v: T): None<T> {
-    return none<T>(v)
+    return none(v)
   }
 
-  function ap<U>(m: Monad<((T) => U)>): None<U> {
-    return none<U>(m.value(value))
+  function ap<U>(m: Maybe<(t: T) => U>): Maybe<U> {
+    return none<U>()
   }
 
-  function join<U extends Maybe<T>>(): Maybe<T> {
-    return none(value) // wat
+  function join(): T {
+    return self.value
   }
 
-  function takeLeft<U>(m: Monad<U>): Maybe<T> {
+  function takeLeft<U>(m: Maybe<U>): Maybe<T> {
     return self
   }
 
-  function takeRight<U>(m: Monad<U>): Maybe<T> {
+  function takeRight<U>(m: Maybe<U>): Maybe<T> {
     return none(value)
+  }
+
+  function filter(f: (t: T) => boolean): Maybe<T> {
+    return self
   }
 
   function toString(): string {
@@ -132,6 +159,15 @@ export function none<T>(t: T): Maybe<T> {
   function caseOf<U,V>(c: MaybeCase<T,U,V>): V {
     return c.none(value)
   }
+
+  function defaulting(t: T): Some<T> {
+    return some(t)
+  }
+
+  function orSome<U>(v: U): U {
+    return v
+  }
+
   return Object.freeze(self)
 
 }

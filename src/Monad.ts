@@ -9,11 +9,11 @@ export interface Monad<T> {
    * bind(m, unit) ≡ m
    * bind(bind(m, f), g) ≡ bind(m, x ⇒ bind(f(x), g))
    */
-  bind<U>(transform: (T) => Monad<U>): Monad<U>
-  map<U>(transform: (T) => U): Monad<U>
+  bind<U>(transform: (t: T) => Monad<U>): Monad<U>
+  map<U>(transform: (t: T) => U): Monad<U>
   unit(value: T): Monad<T>
   ap<U>(m: Monad<((T) => U)>): Monad<U>
-  join<U extends Monad<T>>(): Monad<T>
+  join(): T
   takeLeft<U>(m: Monad<U>): Monad<T>
   takeRight<U>(m: Monad<U>): Monad<U>
   toString(): string

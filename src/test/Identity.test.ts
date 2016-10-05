@@ -4,7 +4,7 @@ import * as mlog from 'mocha-logger'
 
 
 
-describe('identity', function() {
+describe('Identity', function() {
   describe('#constructor()', function() {
     it('creates identity value', function() {
       const m = identity('Hello world')

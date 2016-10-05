@@ -2,7 +2,12 @@ import {Monad} from './Monad'
 
 export interface MaybeCase<T,U,V> {
   some(t: T): U
-  none(t: T): V
+  none(): V
+}
+
+export interface OptionalMaybeCase<T,U> {
+  some?(t: T): U
+  none?(): U
 }
 
 export interface Maybe<T> extends Monad<T> {
@@ -21,6 +26,7 @@ export interface Maybe<T> extends Monad<T> {
   caseOf<U,V>(c: MaybeCase<T,U,V>): U | V
   orSome<U>(m: U): T | U
   orElse(m: Maybe<T>): Maybe<T>
+  do<U>(p: OptionalMaybeCase<T,U>): Maybe<T>
 }
 
 export interface Some<T> extends Maybe<T> {}
@@ -44,7 +50,8 @@ export function some<T>(t: T): Some<T> {
     defaulting,
     caseOf,
     orSome,
-    orElse
+    orElse,
+    do: doIt
   }
 
   function bind<U>(transform: (t: T) => Maybe<U>): Maybe<U> {
@@ -100,6 +107,13 @@ export function some<T>(t: T): Some<T> {
     return self
   }
 
+  function doIt<U>(p: OptionalMaybeCase<T,U>): Maybe<T> {
+    if (p.some) {
+      p.some(self.value)
+    }
+    return self
+  }
+
   return Object.freeze(self)
 }
 
@@ -125,6 +139,7 @@ export function none<T>(t?: T): Maybe<T> {
     defaulting,
     orSome,
     orElse,
+    do: doIt
   }
 
   function bind<U>(transform: (t: T) => Maybe<U>): Maybe<T> {
@@ -144,7 +159,7 @@ export function none<T>(t?: T): Maybe<T> {
   }
 
   function join(): T {
-    return self.value
+    return undefined
   }
 
   function takeLeft<U>(m: Maybe<U>): Maybe<T> {
@@ -152,7 +167,7 @@ export function none<T>(t?: T): Maybe<T> {
   }
 
   function takeRight<U>(m: Maybe<U>): Maybe<T> {
-    return none(value)
+    return self
   }
 
   function filter(f: (t: T) => boolean): Maybe<T> {
@@ -164,7 +179,7 @@ export function none<T>(t?: T): Maybe<T> {
   }
 
   function caseOf<U,V>(c: MaybeCase<T,U,V>): V {
-    return c.none(value)
+    return c.none()
   }
 
   function defaulting(t: T): Some<T> {
@@ -177,6 +192,13 @@ export function none<T>(t?: T): Maybe<T> {
 
   function orElse(m: Maybe<T>): Maybe<T> {
     return m
+  }
+
+  function doIt<U>(p: OptionalMaybeCase<T,U>): Maybe<T> {
+    if (p.none) {
+      p.none()
+    }
+    return self
   }
 
   return Object.freeze(self)

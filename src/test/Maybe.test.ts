@@ -2,7 +2,7 @@ import {Maybe, some, none} from '../Maybe'
 import {expect} from 'chai'
 import * as mlog from 'mocha-logger'
 
-describe('Maybe', function() {
+describe.only('Maybe', function() {
   describe('#constructor()', function() {
     it('can create some', function() {
       const s = some('yee')
@@ -106,9 +106,9 @@ describe('Maybe', function() {
     })
 
     it('unwraps none', function() {
-      const v = none(420).join()
+      const v = none().join()
       mlog.log(v)
-      expect(v).to.equal(420)
+      expect(v).to.be.undefined
     })
   })
   describe('#takeLeft()', function(){
@@ -170,10 +170,10 @@ describe('Maybe', function() {
     })
   })
 
-  describe('#caseOf', function() {
+  describe('#caseOf()', function() {
     const cases = {
       some: n => n * 2,
-      none: n => 'Error'
+      none: () => -1
     }
     it('uses some', function() {
       const r = some(10).caseOf(cases)
@@ -183,11 +183,11 @@ describe('Maybe', function() {
     it('uses none', function() {
       const r = none(10).caseOf(cases)
       mlog.log(r)
-      expect(r).to.equal('Error')
+      expect(r).to.equal(-1)
     })
   })
 
-  describe('#orSome', function() {
+  describe('#orSome()', function() {
     it('returns first value if some', function() {
       const r = some('value1').orSome('other value')
       mlog.log(r)
@@ -201,7 +201,7 @@ describe('Maybe', function() {
     })
   })
 
-  describe('#orElse', function() {
+  describe('#orElse()', function() {
     it('returns first maybe if some', function() {
       const r = some('value1').orElse(some('other value'))
       mlog.log(r)
@@ -217,7 +217,7 @@ describe('Maybe', function() {
     })
   })
 
-  describe('#filter', function() {
+  describe('#filter()', function() {
     it('returns value if true', function() {
       const r = some('value1').filter(i => i === 'value1')
       mlog.log(r)
@@ -241,7 +241,7 @@ describe('Maybe', function() {
     })
   })
 
-  describe('#defaulting', function() {
+  describe('#defaulting()', function() {
     it('returns original if some', function() {
       const r = some('value1').defaulting('default')
       mlog.log(r)
@@ -256,6 +256,53 @@ describe('Maybe', function() {
       expect(r.value).to.equal('default')
     })
 
+  })
+
+  describe('#do()', function() {
+    let somes = 0
+    let nones = 0
+    const caseSome = {
+      some: x => somes += 1
+    }
+    const caseNone = {
+      none: () => nones += 1
+    }
+    beforeEach('reset side effects', function() {
+      somes = 0
+      nones = 0
+    })
+
+    it('runs side effects for some', function() {
+      expect(somes).to.equal(0)
+      expect(nones).to.equal(0)
+      some('thing').do(caseSome)
+      expect(somes).to.equal(1)
+      expect(nones).to.equal(0)
+    })
+
+    it('defaults to no side effects for some', function() {
+      expect(somes).to.equal(0)
+      expect(nones).to.equal(0)
+      some('thing').do(caseNone)
+      expect(somes).to.equal(0)
+      expect(nones).to.equal(0)
+    })
+
+    it('runs side effects for none', function() {
+      expect(somes).to.equal(0)
+      expect(nones).to.equal(0)
+      none().do(caseNone)
+      expect(somes).to.equal(0)
+      expect(nones).to.equal(1)
+    })
+
+    it('defaults to no side effects for none', function() {
+      expect(somes).to.equal(0)
+      expect(nones).to.equal(0)
+      none().do(caseSome)
+      expect(somes).to.equal(0)
+      expect(nones).to.equal(0)
+    })
   })
 
   describe('Maybe in the real world', function() {

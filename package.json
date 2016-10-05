@@ -4,9 +4,11 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
+    "clean": "rm -rf lib",
     "start": "node src",
     "build": "tsc -p .",
-    "test": "mocha lib/test/**/*.js",
+    "clean-build": "npm run clean && tsc -p .",
+    "test": "mocha lib/test/**/*.test.js",
     "watch": "npm run build && run-p \"{build,test} -- --watch\""
   },
   "author": "Lucas Caro <lucascaro@gmail.com>",

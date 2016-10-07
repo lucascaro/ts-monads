@@ -14,7 +14,5 @@ export interface Monad<T> {
   unit(value: T): Monad<T>
   ap<U>(m: Monad<((T) => U)>): Monad<U>
   join(): T
-  takeLeft<U>(m: Monad<U>): Monad<T>
-  takeRight<U>(m: Monad<U>): Monad<U>
   toString(): string
 }

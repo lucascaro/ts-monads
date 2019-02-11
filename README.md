@@ -1,6 +1,6 @@
-# Typescript Node Starter
+# Typescript Simple Monads
 
-A simple node.js project starter for typescript.
+A simple and easy to use library of practical monads for Typescript.
 
 ## Usage
 
@@ -26,18 +26,9 @@ Listens and recompiles the project on src changes.
 npm start
 ```
 
-Runs the main command.
-
-```shell
-npm link
-ts-node-starter-cli
-```
-
-Creates a symlink so you can run the project as a cli tool. Change the default binary name in `package.json`.
-
 ### Testing
 
-Tests are in the `./test/` directory.
+Tests are in the various `./__tests__/` directories.
 
 ```shell
 npm test

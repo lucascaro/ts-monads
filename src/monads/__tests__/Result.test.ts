@@ -146,10 +146,12 @@ describe('Result', () => {
       ).toBe('errfoo');
     });
 
-    test('else err values', () => {
+    test('leave ok untouched', () => {
       expect(
-        err<string, string>('foo').mapOrElse((e) => `else${e}`, (x) => x + x),
-      ).toBe('elsefoo');
+        ok('foo')
+          .mapErr((x) => x)
+          .unwrap(),
+      ).toBe('foo');
     });
   });
 

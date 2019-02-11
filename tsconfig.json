@@ -1,16 +1,23 @@
 {
-    "compileOnSave": true,
-    "compilerOptions": {
-        "noImplicitAny": false,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "declaration": true,
-        "module": "commonjs",
-        "target": "ES6",
-        "outDir": "lib"
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2018",
+    "sourceMap": true,
+    "outDir": "lib",
+    "strict": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "paths": {
+      "@root/*": ["./*"],
+      "@src/*": ["src/*"],
+      "@helpers/*": ["src/helpers/*"]
     },
-    "include": [
-        "src/**/*.ts"
+    "plugins": [
+      {
+        "transform": "@zerollup/ts-transform-paths"
+      }
     ]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "**/node_modules/*"]
 }

@@ -1,10 +1,13 @@
-import {Monad} from './Monad'
+import { Monad } from './Monad'
 
 // Fuck classes
-export interface Identity<T> extends Monad<T> {}
-export function identity<T>(t: T): Identity<T> {
+export interface Identity<T> extends Monad<T> {
+  takeLeft<U> (m: Monad<U>): Identity<T | U>
+  takeRight<U> (m: Monad<U>): Monad<U>
+}
+export function identity<T> (t: T): Identity<T> {
   const value: T = t
-  const self = {
+  const self: Identity<T> = {
     value,
     bind,
     map,
@@ -15,36 +18,36 @@ export function identity<T>(t: T): Identity<T> {
     takeRight,
     toString
   }
-  function bind<U>(transform: (T) => Monad<U>): Monad<U> {
+  function bind<U> (transform: (T) => Monad<U>): Monad<U> {
     return transform(value)
   }
 
-  function map<U>(transform: (t: T) => U): Identity<U> {
+  function map<U> (transform: (t: T) => U): Identity<U> {
     return identity<U>(transform(value))
   }
 
-  function unit(value: T): Identity<T> {
+  function unit (value: T): Identity<T> {
     return identity<T>(value)
   }
 
-  function ap<U>(m: Monad<((T) => U)>): Identity<U> {
+  function ap<U> (m: Monad<(T) => U>): Identity<U> {
     return identity<U>(m.value(value))
   }
 
-  function join(): T {
+  function join (): T {
     return self.value
   }
 
-  function takeLeft<U>(m: Monad<U>): Identity<T> {
+  function takeLeft<U> (m: Monad<U>): Identity<T> {
     return self
   }
 
-  function takeRight<U>(m: Monad<U>): Monad<U> {
+  function takeRight<U> (m: Monad<U>): Monad<U> {
     return m
   }
 
-  function toString(): string {
-     return `Identity(${value})`;
+  function toString (): string {
+    return `Identity(${value})`
   }
 
   return Object.freeze(self)

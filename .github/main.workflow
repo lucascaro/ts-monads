@@ -3,7 +3,7 @@ workflow "Publish on release" {
     "Publish to npm registry",
     "npm ci for release",
   ]
-  on = "release"
+  on = "push"
 }
 
 action "npm ci" {

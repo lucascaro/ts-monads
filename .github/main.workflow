@@ -1,6 +1,6 @@
 workflow "Publish on release" {
   resolves = ["Publish to npm registry"]
-  on = "push"
+  on = "release"
 }
 
 workflow "Test on push for continuous integration" {

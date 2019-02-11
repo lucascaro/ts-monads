@@ -11,7 +11,7 @@ action "npm ci" {
 action "Only on master" {
   uses = "actions/bin/filter@ec328c7554cbb19d9277fc671cf01ec7c661cd9a"
   needs = ["npm ci"]
-  args = "branch master"
+  args = "refs/tags/*"
 }
 
 action "Publish to npm registry" {

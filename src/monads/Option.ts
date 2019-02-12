@@ -7,12 +7,12 @@ export enum OptionKind {
   none = 'none',
 }
 
-export interface Some<T> extends IOption<T> {
+interface Some<T> extends IOption<T> {
   kind: OptionKind.some;
   isSome: true;
   isNone: false;
 }
-export interface None<T> extends IOption<T> {
+interface None<T> extends IOption<T> {
   kind: OptionKind.none;
   isSome: false;
   isNone: true;
@@ -54,7 +54,7 @@ interface IOption<T> {
   okOrElse: <E>(fn: () => E) => Result<T, E>;
 
   // Returns an iterator over the possibly contained value.
-  iter: () => Iterator<T>;
+  [Symbol.iterator]: () => Iterator<T>;
 
   // Returns None if the option is None, otherwise returns optb.
   and: <U>(optb: Option<U>) => Option<U>;
@@ -85,6 +85,14 @@ interface IOption<T> {
   transpose: <R, E>() => Result<Option<R>, E> | never;
 }
 
+// HACK: the following types are needed because the Readonly type removes symbols.
+type ReadonlySome<T> = Readonly<Some<T>> & {
+  [Symbol.iterator]: () => Iterator<T>;
+};
+type ReadonlyNone<T> = Readonly<None<T>> & {
+  [Symbol.iterator]: () => Iterator<T>;
+};
+
 export function some<T>(value: T): Some<T> {
   const self: Some<T> = {
     kind: OptionKind.some,
@@ -99,8 +107,8 @@ export function some<T>(value: T): Some<T> {
     mapOrElse: (def, fn) => fn(value),
     okOr: () => ok(value),
     okOrElse: () => ok(value),
-    *iter() {
-      return value;
+    *[Symbol.iterator]() {
+      yield value;
     },
     and: (optb) => optb,
     andThen: (fn) => fn(value),
@@ -114,7 +122,7 @@ export function some<T>(value: T): Some<T> {
     // transpose: () => value.replace(value.unwrap),
   };
 
-  return Object.freeze(self);
+  return Object.freeze(self) as ReadonlySome<T>;
 }
 
 export function none<T>(): None<T> {
@@ -135,7 +143,7 @@ export function none<T>(): None<T> {
     mapOrElse: (def) => def(),
     okOr: <E>(e: E) => err<T, E>(e),
     okOrElse: (fn) => err(fn()),
-    *iter(): Iterator<T> {},
+    *[Symbol.iterator](): Iterator<T> {},
     and: () => none(),
     andThen: () => none(),
     filter: () => none(),
@@ -148,5 +156,5 @@ export function none<T>(): None<T> {
     // transpose: () => ok(none()),
   };
 
-  return Object.freeze(self);
+  return Object.freeze(self) as ReadonlyNone<T>;
 }

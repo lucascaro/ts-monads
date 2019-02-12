@@ -43,7 +43,7 @@ export default interface IResult<T, E> {
   mapErr: <F>(op: (e: E) => F) => Result<T, F>;
 
   // Returns an iterator over the possibly contained value.
-  iter: () => Iterator<T>;
+  [Symbol.iterator]: () => Iterator<T>;
 
   // Returns res if the result is Ok, otherwise returns the Err value of self.
   and: <U>(res: Result<U, E>) => Result<U, E>;
@@ -80,6 +80,14 @@ export default interface IResult<T, E> {
   transpose: () => Option<Result<T, E>>;
 }
 
+// HACK: the following types are needed because the Readonly type removes symbols.
+type ReadonlyOk<T, E> = Readonly<Ok<T, E>> & {
+  [Symbol.iterator]: () => Iterator<T>;
+};
+type ReadonlyErr<T, E> = Readonly<Err<T, E>> & {
+  [Symbol.iterator]: () => Iterator<T>;
+};
+
 export function ok<T, E>(value: T): Ok<T, E> {
   const self: Ok<T, E> = {
     kind: ResultKind.ok,
@@ -90,8 +98,8 @@ export function ok<T, E>(value: T): Ok<T, E> {
     map: (fn) => ok(fn(value)),
     mapOrElse: (fallback, fn) => fn(value),
     mapErr: () => ok(value),
-    *iter() {
-      return value;
+    *[Symbol.iterator]() {
+      yield value;
     },
     and: (res) => res,
     andThen: (fn) => fn(value),
@@ -112,7 +120,7 @@ export function ok<T, E>(value: T): Ok<T, E> {
     },
   };
 
-  return Object.freeze(self);
+  return Object.freeze(self) as ReadonlyOk<T, E>;
 }
 export function err<T, E>(value: E): Result<T, E> {
   const self: Result<T, E> = {
@@ -124,7 +132,7 @@ export function err<T, E>(value: E): Result<T, E> {
     map: () => err(value),
     mapOrElse: (fallback) => fallback(value),
     mapErr: (fn) => err(fn(value)),
-    *iter(): Iterator<T> {},
+    *[Symbol.iterator](): Iterator<T> {},
     and: () => err(value),
     andThen: () => err(value),
     or: (res) => res,
@@ -144,5 +152,5 @@ export function err<T, E>(value: E): Result<T, E> {
     },
   };
 
-  return Object.freeze(self);
+  return Object.freeze(self) as ReadonlyErr<T, E>;
 }

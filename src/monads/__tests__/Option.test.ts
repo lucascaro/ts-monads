@@ -130,15 +130,13 @@ describe('Option', () => {
 
   describe('#iter', () => {
     test('some iterates once', () => {
-      const it = some('VAL').iter();
-      expect(Symbol.iterator in it).toBe(true);
-      expect(it.next()).toEqual({ value: 'VAL', done: true });
+      const it = some('VAL');
+      expect(Array.from(it)).toEqual(['VAL']);
     });
 
     test('none iterates nonce', () => {
-      const it = none().iter();
-      expect(Symbol.iterator in it).toBe(true);
-      expect(it.next()).toEqual({ value: undefined, done: true });
+      const it = none();
+      expect(Array.from(it)).toEqual([]);
     });
   });
 

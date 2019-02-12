@@ -157,15 +157,11 @@ describe('Result', () => {
 
   describe('#iter', () => {
     test('ok iterates once', () => {
-      const it = ok('VAL').iter();
-      expect(Symbol.iterator in it).toBe(true);
-      expect(it.next()).toEqual({ value: 'VAL', done: true });
+      expect(Array.from(ok('VAL'))).toEqual(['VAL']);
     });
 
     test('err iterates nonce', () => {
-      const it = err('ERR').iter();
-      expect(Symbol.iterator in it).toBe(true);
-      expect(it.next()).toEqual({ value: undefined, done: true });
+      expect(Array.from(err('VAL'))).toEqual([]);
     });
   });
 

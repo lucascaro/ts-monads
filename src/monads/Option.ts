@@ -7,12 +7,12 @@ export enum OptionKind {
   none = 'none',
 }
 
-interface Some<T> extends IOption<T> {
+export interface Some<T> extends IOption<T> {
   kind: OptionKind.some;
   isSome: true;
   isNone: false;
 }
-interface None<T> extends IOption<T> {
+export interface None<T> extends IOption<T> {
   kind: OptionKind.none;
   isSome: false;
   isNone: true;

@@ -1,6 +1,6 @@
 {
   "name": "typescript-simple-monads",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "Simple typescript-enabled monads inspired on Rust.",
   "author": "Lucas Caro",
   "main": "lib/index.js",

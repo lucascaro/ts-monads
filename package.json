@@ -11,7 +11,7 @@
     "start": "node lib/index.js",
     "watch": "ttsc -p . --watch",
     "prepublishOnly": "npm run build",
-    "release": "npm version patch && npm publish",
+    "release": "npm test && npm version patch && npm publish",
     "test": "jest --verbose",
     "test-watch": "jest --watch",
     "ci": "npm ci && npm test && npm run build"
